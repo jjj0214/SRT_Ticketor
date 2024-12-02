@@ -53,11 +53,13 @@
             this.button1 = new System.Windows.Forms.Button();
             this.cbbDepartureStation = new System.Windows.Forms.ComboBox();
             this.cbbArrivalStation = new System.Windows.Forms.ComboBox();
+            this.btnLogin = new System.Windows.Forms.Button();
+            this.btnLogout = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnRun
             // 
-            this.btnRun.Location = new System.Drawing.Point(34, 360);
+            this.btnRun.Location = new System.Drawing.Point(316, 502);
             this.btnRun.Margin = new System.Windows.Forms.Padding(4);
             this.btnRun.Name = "btnRun";
             this.btnRun.Size = new System.Drawing.Size(289, 80);
@@ -94,6 +96,7 @@
             this.tbID.Name = "tbID";
             this.tbID.Size = new System.Drawing.Size(164, 28);
             this.tbID.TabIndex = 1;
+            this.tbID.Text = "01055033004";
             // 
             // tbPW
             // 
@@ -251,7 +254,7 @@
             // 
             // btnStop
             // 
-            this.btnStop.Location = new System.Drawing.Point(354, 360);
+            this.btnStop.Location = new System.Drawing.Point(629, 502);
             this.btnStop.Margin = new System.Windows.Forms.Padding(4);
             this.btnStop.Name = "btnStop";
             this.btnStop.Size = new System.Drawing.Size(289, 80);
@@ -288,7 +291,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(357, 248);
+            this.button1.Location = new System.Drawing.Point(629, 361);
             this.button1.Margin = new System.Windows.Forms.Padding(4);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(289, 80);
@@ -315,11 +318,36 @@
             this.cbbArrivalStation.Size = new System.Drawing.Size(119, 26);
             this.cbbArrivalStation.TabIndex = 26;
             // 
+            // btnLogin
+            // 
+            this.btnLogin.Location = new System.Drawing.Point(19, 361);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(289, 80);
+            this.btnLogin.TabIndex = 27;
+            this.btnLogin.Text = "LOGIN";
+            this.btnLogin.UseVisualStyleBackColor = true;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // btnLogout
+            // 
+            this.btnLogout.Enabled = false;
+            this.btnLogout.Location = new System.Drawing.Point(316, 361);
+            this.btnLogout.Margin = new System.Windows.Forms.Padding(4);
+            this.btnLogout.Name = "btnLogout";
+            this.btnLogout.Size = new System.Drawing.Size(289, 80);
+            this.btnLogout.TabIndex = 28;
+            this.btnLogout.Text = "LOG OUT";
+            this.btnLogout.UseVisualStyleBackColor = true;
+            this.btnLogout.Click += new System.EventHandler(this.btnLogout_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 18F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(676, 458);
+            this.ClientSize = new System.Drawing.Size(931, 610);
+            this.Controls.Add(this.btnLogout);
+            this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.cbbArrivalStation);
             this.Controls.Add(this.cbbDepartureStation);
             this.Controls.Add(this.button1);
@@ -381,6 +409,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.ComboBox cbbDepartureStation;
         private System.Windows.Forms.ComboBox cbbArrivalStation;
+        private System.Windows.Forms.Button btnLogin;
+        private System.Windows.Forms.Button btnLogout;
     }
 }
 

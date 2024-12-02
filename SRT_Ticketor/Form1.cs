@@ -36,6 +36,9 @@ namespace SRT_Ticketor
         private DateTime dtReserve;
         private TimeSpan tsStartTime, tsEndTime;
         private bool chkVIP, chkNormal;
+        private bool isLoggedIn=false;
+
+        private CookieContainer loginCookie = new CookieContainer();
 
         private static bool stopThread = false;
         protected System.Threading.Thread runThread = null;
@@ -62,6 +65,8 @@ namespace SRT_Ticketor
         public TimeSpan ReserveStartTime { get => tsStartTime; set { tsStartTime = value; } }
         public TimeSpan ReserveEndTime { get => tsEndTime; set { tsEndTime = value; } }
         public IWebDriver WebDriver { get=>webDriver; set => webDriver = value; }
+        public CookieContainer LoginCookie { get => LoginCookie; set => LoginCookie= value; }
+        public bool IsLoggedIn { get => isLoggedIn; set => isLoggedIn = value; }
 
         public bool BookVIP { get => chkVIP; set { chkVIP = value; } }
         public bool BookNormal { get => chkNormal; set { chkNormal = value; } }
@@ -156,6 +161,11 @@ namespace SRT_Ticketor
                     if(output.InnerText=="") //Login 성공
                     {
                         isLoggedIn = true;
+                        MessageBox.Show("Login 성공");
+                    }
+                    else
+                    {
+                        MessageBox.Show(output.InnerText);
                     }
                 }
 
@@ -267,6 +277,97 @@ namespace SRT_Ticketor
             }
         }
 
+        private void btnLogin_Click(object sender, EventArgs e)
+        {
+            //로그인 헤더
+            string url = "https://etk.srail.kr/cmc/01/selectLoginInfo.do?pageId=TK0701000000";
+            string responseText = string.Empty;
+            ID = Regex.Replace(tbID.Text, @"(\d{3})(\d{4})(\d{4})", "$1-$2-$3");
+            string PostData = string.Format("rsvTpCd=&goUrl=&from=&srchDvCd=3&srchDvNm={0}&hmpgPwdCphd={1}&saveCelNoYn=Y", ID, tbPW.Text);
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+            request.Timeout = 30 * 1000; // 30초
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.KeepAlive = true;
+            request.AllowAutoRedirect = false;
+            request.CookieContainer = LoginCookie;
+
+            StreamWriter writer = new StreamWriter(request.GetRequestStream());
+            writer.Write(PostData);
+            writer.Close();
+
+            using (HttpWebResponse resp = (HttpWebResponse)request.GetResponse())
+            {
+                HttpStatusCode status = resp.StatusCode;
+                Console.WriteLine(status);  // 정상이면 "OK"
+
+                Stream respStream = resp.GetResponseStream();
+                using (StreamReader sr = new StreamReader(respStream))
+                {
+                    responseText = sr.ReadToEnd();
+                }
+
+                HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                doc.LoadHtml(responseText);
+                var output = doc.DocumentNode.SelectSingleNode("//head/title");
+
+                //Console.WriteLine(output.InnerText);
+                if (output.InnerText == "") //Login 성공
+                {
+                    IsLoggedIn = true;
+                    btnLogout.Enabled = true;
+                    btnLogin.Enabled = false;
+                    MessageBox.Show("Login 성공");
+                }
+                else
+                {
+                    MessageBox.Show(output.InnerText);
+                }
+            }
+        }
+
+        private void btnLogout_Click(object sender, EventArgs e)
+        {
+            //LOGOUT
+            if (isLoggedIn)
+            {
+                string url = "https://etk.srail.kr/cmc/01/selectLogoutInfo.do";
+                string responseText = string.Empty;
+
+                HttpWebRequest requestLogout = (HttpWebRequest)WebRequest.Create(url);
+                requestLogout.Method = "GET";
+                requestLogout.Host = "etk.srail.kr";
+                requestLogout.CookieContainer = LoginCookie;
+                requestLogout.Referer = "https://etk.srail.kr/main.do";
+                requestLogout.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7";
+
+                using (HttpWebResponse resp = (HttpWebResponse)requestLogout.GetResponse())
+                {
+                    HttpStatusCode status = resp.StatusCode;
+                    Console.WriteLine(status);  // 정상이면 "OK"
+
+                    Stream respStream = resp.GetResponseStream();
+                    using (StreamReader sr = new StreamReader(respStream))
+                    {
+                        responseText = sr.ReadToEnd();
+                    }
+
+                    HtmlAgilityPack.HtmlDocument doc = new HtmlAgilityPack.HtmlDocument();
+                    doc.LoadHtml(responseText);
+                    var output = doc.DocumentNode.SelectSingleNode("//head/title");
+
+                    //Console.WriteLine(output.InnerText);
+                    if (output.InnerText == "") //Logout 성공
+                    {
+                        IsLoggedIn = false;
+                        btnLogout.Enabled = false;
+                        btnLogin.Enabled = true;
+                    }
+                }
+            }
+        }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             dtPicker.Value = DateTime.Now;
@@ -304,6 +405,9 @@ namespace SRT_Ticketor
 
                 cbbDepartureStation.DataSource = departureStation;
                 cbbArrivalStation.DataSource = arrivalStation;
+
+                cbbDepartureStation.SelectedIndex = departureStation.IndexOf("동탄");
+                cbbArrivalStation.SelectedIndex = arrivalStation.IndexOf("수서");
             }
             catch (Exception ex) 
             { 
