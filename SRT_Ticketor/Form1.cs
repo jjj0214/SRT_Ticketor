@@ -48,6 +48,8 @@ namespace SRT_Ticketor
         private const string chatID = "6428946348";
         //https://api.telegram.org/bot6749783435:AAGTBALpcBtpVzGunDflPQIb7XWGbkIwHnM/getUpdates
         //접속해 본인의 chat ID찾아 입력하기
+
+        private List<string> stationNumber = new List<string>();
         #endregion
 
         #region Properties
@@ -383,25 +385,40 @@ namespace SRT_Ticketor
                 string url = "https://etk.srail.kr/main.do";
                 HtmlWeb web = new HtmlWeb();
                 HtmlAgilityPack.HtmlDocument doc = web.Load(url);
-                var outputDpt = doc.DocumentNode.SelectSingleNode("//*[@id=\"dptRsStnCd\"]");
-                for (int i = 0; i < outputDpt.ChildNodes.Count(); i++)
-                {
-                    if (outputDpt.ChildNodes[i].Name == "option")
-                    {
-                        departureStation.Add(outputDpt.ChildNodes[i].InnerText);
-                    }
-                }
-                departureStation.RemoveAt(0);//출발역 제거
+                HtmlNodeCollection nodesDptStn = doc.DocumentNode.SelectNodes("//select[@id=\"dptRsStnCd\"]/option");
 
-                var outputArrival = doc.DocumentNode.SelectSingleNode("//*[@id=\"arvRsStnCd\"]");
-                for (int i = 0; i < outputArrival.ChildNodes.Count(); i++)
+                stationNumber.Clear();
+                for (int i = 1; i < nodesDptStn.Count; i++)
                 {
-                    if (outputArrival.ChildNodes[i].Name == "option")
-                    {
-                        arrivalStation.Add(outputArrival.ChildNodes[i].InnerText);
-                    }
+                    stationNumber.Add(nodesDptStn[i].Attributes["value"].Value);
+                    departureStation.Add(nodesDptStn[i].InnerText);
                 }
-                arrivalStation.RemoveAt(0);//도착역 제거
+                //var outputDpt = doc.DocumentNode.SelectSingleNode("//*[@id=\"dptRsStnCd\"]");
+                //for (int i = 0; i < outputDpt.ChildNodes.Count(); i++)
+                //{
+                //    if (outputDpt.ChildNodes[i].Name == "option")
+                //    {
+                //        departureStation.Add(outputDpt.ChildNodes[i].InnerText);
+                //    }
+                //}
+                //departureStation.RemoveAt(0);//출발역 제거
+
+                HtmlNodeCollection nodesArvStn = doc.DocumentNode.SelectNodes("//select[@id=\"arvRsStnCd\"]/option");
+
+                for (int i = 1; i < nodesArvStn.Count; i++)
+                {
+                    arrivalStation.Add(nodesArvStn[i].InnerText);
+                }
+
+                //var outputArrival = doc.DocumentNode.SelectSingleNode("//*[@id=\"arvRsStnCd\"]");
+                //for (int i = 0; i < outputArrival.ChildNodes.Count(); i++)
+                //{
+                //    if (outputArrival.ChildNodes[i].Name == "option")
+                //    {
+                //        arrivalStation.Add(outputArrival.ChildNodes[i].InnerText);
+                //    }
+                //}
+                //arrivalStation.RemoveAt(0);//도착역 제거
 
                 cbbDepartureStation.DataSource = departureStation;
                 cbbArrivalStation.DataSource = arrivalStation;
